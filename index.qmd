@@ -1,0 +1,85 @@
+---
+title: ""
+format:
+  html:
+    self-contained: true
+    toc: false
+    theme: none
+    include-in-header:
+      text: |
+        <script src="//embed.typeform.com/next/embed.js"></script>
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+#| 
+library(sf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| 
+
+lille_l93 <- st_read(
+  here::here("dev/lille/lille_l93.gpkg"),
+  quiet = TRUE
+)
+
+# La carte doit être en coordonnées non projetées
+lille_wgs84 <- lille_l93 |> st_transform(crs = 4326) # EPSG: 4326
+
+lille_square_l93 <- lille_l93 %>% 
+  st_make_grid(
+    what = "polygons", 
+    square = FALSE, # TRUE = rectangle, FALSE = hexagones
+    cellsize = c(400, 400) # Dimension en mètre, car shapefile en mètre (lambert 93)
+  ) %>% 
+  st_sf() %>% 
+  mutate(id = 1:n()) %>% 
+  dplyr::select(id, geometry)
+
+# La carte doit être en coordonnées non projetées
+lille_square_wgs84 <- lille_square_l93 |> st_transform(crs = 4326)
+lille_square_centroid_wgs84 <- lille_square_wgs84 |> st_centroid()
+
+lille_square_data_wgs84_inter <- st_intersection(
+  lille_square_wgs84,
+  lille_wgs84
+)
+```
+
+```{r}
+leaflet(
+  height= "100vh",
+  width = "100%"
+) |> 
+  addProviderTiles(
+    providers$Stadia.StamenTonerLite
+  ) |> 
+addPolygons(
+    data = lille_wgs84,
+    color = "#000",
+    fillColor = "transparent",
+    weight = 2.3
+  )  |> 
+  addPolygons(
+    data = lille_square_data_wgs84_inter,
+    color = "#000", 
+    fillColor = "transparent",
+    weight = 2.3, 
+    popup = ~glue::glue(
+      "Vous avez cliqué sur la zone: <b>{id}</b> <br> Passer à la question suivante: 
+      <a href='https://justine15.typeform.com/to/BypfUOK4#position={id}'>Débuter le questionnaire</a>"
+    ),
+    popupOptions = popupOptions(
+      closeButton = FALSE,
+      closeOnClick = TRUE
+    )
+  )
+```
