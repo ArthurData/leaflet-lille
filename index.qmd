@@ -29,7 +29,7 @@ library(ggplot2)
 #| 
 
 lille_l93 <- st_read(
-  here::here("dev/lille/lille_l93.gpkg"),
+  here::here("lille_l93.gpkg"),
   quiet = TRUE
 )
 
@@ -80,7 +80,7 @@ shiny::tags$div(
       weight = 2.3,
       popup = ~ glue::glue(
         "Vous avez cliqué sur la zone: <b>{id}</b> <br> Passer à la question suivante: 
-      <a href='https://justine15.typeform.com/to/BypfUOK4#position={id}'>Débuter le questionnaire</a>"
+      <a href='https://benev-upec.limesurvey.net/213865?lang=fr&position={id}'>Débuter le questionnaire</a>"
       ),
       popupOptions = popupOptions(
         closeButton = FALSE,
