@@ -80,7 +80,7 @@ shiny::tags$div(
       weight = 2.3,
       popup = ~ glue::glue(
         "Vous avez cliqué sur la zone: <b>{id}</b> <br> Passer à la question suivante: 
-      <a href='https://benev-upec.limesurvey.net/889678?lang=fr&position={id}'>Débuter le questionnaire</a>"
+      <a href='/'>Débuter le questionnaire</a>"
       ),
       popupOptions = popupOptions(
         closeButton = FALSE,
